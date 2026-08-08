@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <title>Penyerahan Hasil Radiologi</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f6f8;
+      color: #222;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .header {
+      background: white;
+      padding: 18px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: #777;
+      font-size: 12px;
+    }
+
+    .menu {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+
+      padding: 10px 15px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .menu button {
+      height: 42px;
+      border: none;
+      border-radius: 9px;
+      background: #eee;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .menu button.active {
+      background: #222;
+      color: white;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: auto;
+      padding: 15px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e4e4e4;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 15px;
+    }
+
+    .status {
+      background: white;
+      border: 1px solid #e4e4e4;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .status-number {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .status-text {
+      color: #888;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 46px;
+      border: 1px solid #d5d5d5;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 14px;
+      background: white;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #333;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      width: 100%;
+      min-height: 45px;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #222;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #eee;
+      color: #222;
+    }
+
+    .btn-danger {
+      background: #f5eeee;
+      color: #c62828;
+    }
+
+    .pending-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .patient-item {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .patient-number {
+      color: #888;
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .patient-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .patient-info {
+      color: #666;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .patient-actions {
+      display: grid;
+      grid-template-columns: 1fr 80px;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 25px 10px;
+      color: #888;
+      font-size: 13px;
+    }
+
+    #signatureSection {
+      display: none;
+    }
+
+    .signing-info {
+      background: #f6f6f6;
+      border-radius: 9px;
+      padding: 13px;
+      margin-bottom: 15px;
+    }
+
+    .signing-label {
+      color: #888;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .signing-name {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .signing-detail {
+      color: #666;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    #signature {
+      display: block;
+      width: 100%;
+      height: 200px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      touch-action: none;
+    }
+
+    .signature-hint {
+      text-align: center;
+      color: #999;
+      font-size: 11px;
+      margin: 7px 0 12px;
+    }
+
+    .history-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .filter {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .filter input {
+      margin-bottom: 0;
+    }
+
+    .history-item {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .history-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .history-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 12px;
+    }
+
+    .history-row:last-child {
+      border-bottom: none;
+    }
+
+    .history-label {
+      color: #888;
+    }
+
+    .history-value {
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .ttd-link {
+      display: inline-block;
+      background: #222;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 11px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #888;
+      font-size: 11px;
+      padding: 25px 15px 30px;
+    }
+
+    /* POPUP */
+
+    .popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+
+    .popup.show {
+      display: flex;
+    }
+
+    .popup-box {
+      width: 100%;
+      max-width: 350px;
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0,0,0,.2);
+    }
+
+    .popup-icon {
+      width: 50px;
+      height: 50px;
+      margin: auto auto 12px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .success {
+      background: #e9f7ee;
+      color: #188038;
+    }
+
+    .warning {
+      background: #fff4df;
+      color: #c47700;
+    }
+
+    .error {
+      background: #fdeaea;
+      color: #d93025;
+    }
+
+    .popup-title {
+      font-weight: 700;
+      font-size: 17px;
+      margin-bottom: 7px;
+    }
+
+    .popup-message {
+      color: #666;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .popup button {
+      width: 100%;
+      height: 43px;
+      border: none;
+      border-radius: 8px;
+      background: #222;
+      color: white;
+      font-weight: 600;
+    }
+
+    @media (max-width: 430px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+
+  <header class="header">
+    <div class="title">
+      Penyerahan Hasil Radiologi
+    </div>
+
+    <div class="subtitle">
+      Instalasi Radiologi
+    </div>
+  </header>
+
+
+  <!-- MENU -->
+
+  <nav class="menu">
+
+    <button
+      id="menuPenyerahan"
+      class="active"
+      onclick="showPage('penyerahan')">
+
+      Penyerahan
+
+    </button>
+
+    <button
+      id="menuRiwayat"
+      onclick="showPage('riwayat')">
+
+      Riwayat
+
+    </button>
+
+  </nav>
+
+
+  <main class="container">
+
+
+    <!-- ================================
+         PENYERAHAN
+    ================================= -->
+
+    <section
+      id="penyerahan"
+      class="page active">
+
+
+      <div class="status">
+
+        <div
+          id="pendingCount"
+          class="status-number">
+
+          0 pasien
+
+        </div>
+
+        <div class="status-text">
+
+          Pasien yang belum disimpan
+
+        </div>
+
+      </div>
+
+
+      <!-- DATA PASIEN -->
+
+      <div class="card">
+
+        <label>Nama Pasien</label>
+
+        <input
+          id="namaPasien"
+          type="text"
+          placeholder="Masukkan nama pasien">
+
+
+        <div class="grid-2">
+
+          <div>
+
+            <label>No RM</label>
+
+            <input
+              id="noRM"
+              type="text"
+              inputmode="numeric"
+              placeholder="Masukkan No RM">
+
+          </div>
+
+
+          <div>
+
+            <label>Jenis Pemeriksaan</label>
+
+            <input
+              id="jenis"
+              type="text"
+              placeholder="Contoh: Thorax">
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- PENERIMA -->
+
+      <div class="card">
+
+        <label>Nama Penerima</label>
+
+        <input
+          id="penerima"
+          type="text"
+          placeholder="Masukkan nama penerima">
+
+
+        <label>Hubungan Dengan Pasien</label>
+
+        <select id="hubungan">
+
+          <option value="">
+            Pilih Hubungan
+          </option>
+
+          <option>
+            Pasien Sendiri
+          </option>
+
+          <option>
+            Petugas Rumah Sakit
+          </option>
+
+          <option>
+            Keluarga Pasien
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- PETUGAS -->
+
+      <div class="card">
+
+        <label>Petugas Radiologi</label>
+
+        <select id="petugas">
+
+          <option value="">
+            Pilih Petugas
+          </option>
+
+          <option>
+            Yuanida Nurcholifah
+          </option>
+
+          <option>
+            Risma Ika F.
+          </option>
+
+          <option>
+            M. Nasrulloh
+          </option>
+
+          <option>
+            Perdana F. R.
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- TAMBAH PASIEN -->
+
+      <button
+        class="btn btn-primary"
+        onclick="addPatient()">
+
+        + Tambah Pasien ke Daftar
+
+      </button>
+
+
+      <!-- DAFTAR PASIEN -->
+
+      <div class="card" style="margin-top:15px;">
+
+        <div class="pending-title">
+
+          Pasien Menunggu Tanda Tangan
+
+        </div>
+
+        <div id="pendingList">
+
+          <div class="empty">
+
+            Belum ada pasien.
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- TANDA TANGAN -->
+
+      <div
+        id="signatureSection"
+        class="card">
+
+
+        <div class="signing-info">
+
+          <div class="signing-label">
+            Tanda tangan untuk
+          </div>
+
+          <div
+            id="signingPatient"
+            class="signing-name">
+          </div>
+
+          <div
+            id="signingDetail"
+            class="signing-detail">
+          </div>
+
+        </div>
+
+
+        <label>
+          Tanda Tangan Penerima
+        </label>
+
+
+        <canvas id="signature"></canvas>
+
+
+        <div class="signature-hint">
+
+          Silakan tanda tangan menggunakan jari
+
+        </div>
+
+
+        <button
+          class="btn btn-secondary"
+          onclick="clearSignature()">
+
+          Hapus Tanda Tangan
+
+        </button>
+
+
+        <button
+          id="saveButton"
+          class="btn btn-primary"
+          style="margin-top:8px;"
+          onclick="savePatient()">
+
+          Simpan Tanda Tangan & Data
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ================================
+         RIWAYAT
+    ================================= -->
+
+    <section
+      id="riwayat"
+      class="page">
+
+
+      <div class="card">
+
+        <div class="history-title">
+
+          Riwayat Penyerahan
+
+        </div>
+
+
+        <div class="filter">
+
+          <input
+            id="search"
+            type="search"
+            placeholder="Cari nama, No RM, pemeriksaan..."
+            oninput="filterHistory()">
+
+
+          <input
+            id="dateFilter"
+            type="date"
+            onchange="filterHistory()">
+
+
+          <button
+            class="btn btn-secondary"
+            onclick="resetFilter()">
+
+            Reset Filter
+
+          </button>
+
+        </div>
+
+
+        <div id="historyList">
+
+          <div class="empty">
+
+            Memuat riwayat...
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <footer class="footer">
+
+    Kau akan mati, apa sebelum itu,
+    supaya berguna saat di bumi.
+
+    <div>
+      Have a nice day :)
+    </div>
+
+  </footer>
+
+
+  <!-- POPUP -->
+
+  <div
+    id="popup"
+    class="popup">
+
+    <div class="popup-box">
+
+      <div
+        id="popupIcon"
+        class="popup-icon success">
+
+        ✓
+
+      </div>
+
+      <div
+        id="popupTitle"
+        class="popup-title">
+
+        Berhasil
+
+      </div>
+
+      <div
+        id="popupMessage"
+        class="popup-message">
+
+      </div>
+
+      <button onclick="closePopup()">
+
+        OK
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+<script>
+
+/* =====================================================
+   URL APPS SCRIPT
+===================================================== */
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbwNfQPKWmKZ2sf_f5Fxg8quYgJtyQKxH5aT1E5IrnbtIF5zPbcD5oeF772PsXYOf-jR/exec";
+
+
+/* =====================================================
+   DATA SEMENTARA
+===================================================== */
+
+let pendingPatients = [];
+
+let currentPatient = null;
+
+let historyData = [];
+
+
+/* =====================================================
+   MENU
+===================================================== */
+
+function showPage(page) {
+
+  document
+    .querySelectorAll(".page")
+    .forEach(function(el) {
+
+      el.classList.remove("active");
+
+    });
+
+
+  document
+    .getElementById(page)
+    .classList.add("active");
+
+
+  document
+    .getElementById("menuPenyerahan")
+    .classList.remove("active");
+
+
+  document
+    .getElementById("menuRiwayat")
+    .classList.remove("active");
+
+
+  if (page === "penyerahan") {
+
+    document
+      .getElementById("menuPenyerahan")
+      .classList.add("active");
+
+  }
+
+
+  if (page === "riwayat") {
+
+    document
+      .getElementById("menuRiwayat")
+      .classList.add("active");
+
+    loadHistory();
+
+  }
+
+}
+
+
+/* =====================================================
+   POPUP
+===================================================== */
+
+function showPopup(
+  type,
+  title,
+  message
+) {
+
+  const popup =
+    document.getElementById("popup");
+
+  const icon =
+    document.getElementById("popupIcon");
+
+  document
+    .getElementById("popupTitle")
+    .innerText = title;
+
+  document
+    .getElementById("popupMessage")
+    .innerText = message;
+
+
+  icon.className =
+    "popup-icon " + type;
+
+
+  if (type === "success") {
+
+    icon.innerText = "✓";
+
+  }
+
+  else if (type === "warning") {
+
+    icon.innerText = "!";
+
+  }
+
+  else {
+
+    icon.innerText = "×";
+
+  }
+
+
+  popup.classList.add("show");
+
+
+  if (type === "success") {
+
+    setTimeout(
+      closePopup,
+      1600
+    );
+
+  }
+
+}
+
+
+function closePopup() {
+
+  document
+    .getElementById("popup")
+    .classList.remove("show");
+
+}
+
+
+/* =====================================================
+   TAMBAH PASIEN
+===================================================== */
+
+function addPatient() {
+
+  const nama =
+    document
+      .getElementById("namaPasien")
+      .value.trim();
+
+  const noRM =
+    document
+      .getElementById("noRM")
+      .value.trim();
+
+  const jenis =
+    document
+      .getElementById("jenis")
+      .value.trim();
+
+  const penerima =
+    document
+      .getElementById("penerima")
+      .value.trim();
+
+  const hubungan =
+    document
+      .getElementById("hubungan")
+      .value;
+
+  const petugas =
+    document
+      .getElementById("petugas")
+      .value;
+
+
+  if (!nama) {
+
+    showPopup(
+      "warning",
+      "Nama belum diisi",
+      "Silakan masukkan nama pasien."
+    );
+
+    return;
+
+  }
+
+
+  if (!noRM) {
+
+    showPopup(
+      "warning",
+      "No RM belum diisi",
+      "Silakan masukkan No RM."
+    );
+
+    return;
+
+  }
+
+
+  if (!jenis) {
+
+    showPopup(
+      "warning",
+      "Pemeriksaan belum diisi",
+      "Silakan masukkan jenis pemeriksaan."
+    );
+
+    return;
+
+  }
+
+
+  if (!penerima) {
+
+    showPopup(
+      "warning",
+      "Penerima belum diisi",
+      "Silakan masukkan nama penerima."
+    );
+
+    return;
+
+  }
+
+
+  if (!hubungan) {
+
+    showPopup(
+      "warning",
+      "Hubungan belum dipilih",
+      "Silakan pilih hubungan dengan pasien."
+    );
+
+    return;
+
+  }
+
+
+  if (!petugas) {
+
+    showPopup(
+      "warning",
+      "Petugas belum dipilih",
+      "Silakan pilih petugas radiologi."
+    );
+
+    return;
+
+  }
+
+
+  pendingPatients.push({
+
+    namaPasien: nama,
+
+    noRM: noRM,
+
+    jenis: jenis,
+
+    penerima: penerima,
+
+    hubungan: hubungan,
+
+    petugas: petugas
+
+  });
+
+
+  renderPatients();
+
+  clearForm();
+
+
+  showPopup(
+    "success",
+    "Pasien ditambahkan",
+    "Pasien masuk ke daftar sementara."
+  );
+
+}
+
+
+/* =====================================================
+   RENDER PASIEN
+===================================================== */
+
+function renderPatients() {
+
+  const list =
+    document.getElementById(
+      "pendingList"
+    );
+
+
+  document
+    .getElementById("pendingCount")
+    .innerText =
+    pendingPatients.length +
+    " pasien";
+
+
+  if (
+    pendingPatients.length === 0
+  ) {
+
+    list.innerHTML = `
+      <div class="empty">
+        Belum ada pasien.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML = "";
+
+
+  pendingPatients.forEach(
+    function(patient, index) {
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "patient-item";
+
+
+      div.innerHTML = `
+
+        <div class="patient-number">
+          Pasien ${index + 1}
+        </div>
+
+        <div class="patient-name">
+          ${escapeHTML(patient.namaPasien)}
+        </div>
+
+        <div class="patient-info">
+
+          No RM:
+          ${escapeHTML(patient.noRM)}
+
+          <br>
+
+          Pemeriksaan:
+          ${escapeHTML(patient.jenis)}
+
+          <br>
+
+          Penerima:
+          ${escapeHTML(patient.penerima)}
+
+          <br>
+
+          Petugas:
+          ${escapeHTML(patient.petugas)}
+
+        </div>
+
+        <div class="patient-actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="selectPatient(${index})">
+
+            Tanda Tangan
+
+          </button>
+
+          <button
+            class="btn btn-danger"
+            onclick="deletePatient(${index})">
+
+            Hapus
+
+          </button>
+
+        </div>
+      `;
+
+
+      list.appendChild(div);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   PILIH PASIEN UNTUK TANDA TANGAN
+===================================================== */
+
+function selectPatient(index) {
+
+  currentPatient =
+    pendingPatients[index];
+
+
+  document
+    .getElementById("signingPatient")
+    .innerText =
+    currentPatient.namaPasien;
+
+
+  document
+    .getElementById("signingDetail")
+    .innerText =
+    "No RM: " +
+    currentPatient.noRM +
+    " • " +
+    currentPatient.jenis;
+
+
+  document
+    .getElementById("signatureSection")
+    .style.display =
+    "block";
+
+
+  clearSignature();
+
+
+  setTimeout(
+    function() {
+
+      resizeCanvas();
+
+    },
+    100
+  );
+
+
+  document
+    .getElementById("signatureSection")
+    .scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+}
+
+
+/* =====================================================
+   HAPUS PASIEN
+===================================================== */
+
+function deletePatient(index) {
+
+  pendingPatients.splice(
+    index,
+    1
+  );
+
+
+  currentPatient = null;
+
+
+  document
+    .getElementById("signatureSection")
+    .style.display =
+    "none";
+
+
+  renderPatients();
+
+}
+
+
+/* =====================================================
+   CLEAR FORM
+===================================================== */
+
+function clearForm() {
+
+  document
+    .getElementById("namaPasien")
+    .value = "";
+
+  document
+    .getElementById("noRM")
+    .value = "";
+
+  document
+    .getElementById("jenis")
+    .value = "";
+
+  document
+    .getElementById("penerima")
+    .value = "";
+
+  document
+    .getElementById("hubungan")
+    .value = "";
+
+  document
+    .getElementById("petugas")
+    .value = "";
+
+}
+
+
+/* =====================================================
+   CANVAS TANDA TANGAN
+===================================================== */
+
+const canvas =
+  document.getElementById(
+    "signature"
+  );
+
+const ctx =
+  canvas.getContext("2d");
+
+let drawing = false;
+
+
+function resizeCanvas() {
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+  const ratio =
+    window.devicePixelRatio || 1;
+
+
+  canvas.width =
+    rect.width * ratio;
+
+  canvas.height =
+    rect.height * ratio;
+
+
+  ctx.setTransform(
+    ratio,
+    0,
+    0,
+    ratio,
+    0,
+    0
+  );
+
+
+  ctx.lineWidth = 2;
+
+  ctx.lineCap = "round";
+
+  ctx.lineJoin = "round";
+
+  ctx.strokeStyle = "#111";
+
+}
+
+
+function position(e) {
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+
+  const source =
+    e.touches
+      ? e.touches[0]
+      : e;
+
+
+  return {
+
+    x:
+      source.clientX -
+      rect.left,
+
+    y:
+      source.clientY -
+      rect.top
+
+  };
+
+}
+
+
+function startDraw(e) {
+
+  e.preventDefault();
+
+  drawing = true;
+
+  const p =
+    position(e);
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    p.x,
+    p.y
+  );
+
+}
+
+
+function draw(e) {
+
+  if (!drawing)
+    return;
+
+
+  e.preventDefault();
+
+  const p =
+    position(e);
+
+
+  ctx.lineTo(
+    p.x,
+    p.y
+  );
+
+
+  ctx.stroke();
+
+}
+
+
+function stopDraw() {
+
+  drawing = false;
+
+  ctx.closePath();
+
+}
+
+
+canvas.addEventListener(
+  "mousedown",
+  startDraw
+);
+
+canvas.addEventListener(
+  "mousemove",
+  draw
+);
+
+canvas.addEventListener(
+  "mouseup",
+  stopDraw
+);
+
+canvas.addEventListener(
+  "mouseleave",
+  stopDraw
+);
+
+canvas.addEventListener(
+  "touchstart",
+  startDraw,
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchmove",
+  draw,
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchend",
+  stopDraw
+);
+
+
+function clearSignature() {
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+}
+
+
+function signatureEmpty() {
+
+  const blank =
+    document.createElement("canvas");
+
+
+  blank.width =
+    canvas.width;
+
+  blank.height =
+    canvas.height;
+
+
+  return (
+    canvas.toDataURL() ===
+    blank.toDataURL()
+  );
+
+}
+
+
+/* =====================================================
+   SIMPAN PASIEN
+===================================================== */
+
+async function savePatient() {
+
+  if (!currentPatient) {
+
+    showPopup(
+      "warning",
+      "Pasien belum dipilih",
+      "Pilih pasien terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+
+  if (signatureEmpty()) {
+
+    showPopup(
+      "warning",
+      "Tanda tangan kosong",
+      "Silakan bubuhkan tanda tangan terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+
+  const button =
+    document.getElementById(
+      "saveButton"
+    );
+
+
+  button.disabled = true;
+
+  button.innerText =
+    "Menyimpan...";
+
+
+  const data = {
+
+    namaPasien:
+      currentPatient.namaPasien,
+
+    noRM:
+      currentPatient.noRM,
+
+    jenis:
+      currentPatient.jenis,
+
+    penerima:
+      currentPatient.penerima,
+
+    hubungan:
+      currentPatient.hubungan,
+
+    petugas:
+      currentPatient.petugas,
+
+    ttd:
+      canvas.toDataURL(
+        "image/png"
+      )
+
+  };
+
+
+  try {
+
+    /*
+      Mengirim data ke Apps Script.
+    */
+
+    await fetch(
+      API_URL,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "text/plain;charset=utf-8"
+        },
+
+        body:
+          JSON.stringify(data)
+      }
+    );
+
+
+    /*
+      Karena Apps Script dapat melakukan
+      redirect, kita tidak bergantung pada
+      response JSON untuk menentukan tampilan.
+    */
+
+    pendingPatients =
+      pendingPatients.filter(
+        function(patient) {
+
+          return (
+            patient !==
+            currentPatient
+          );
+
+        }
+      );
+
+
+    currentPatient = null;
+
+
+    renderPatients();
+
+    clearSignature();
+
+
+    document
+      .getElementById(
+        "signatureSection"
+      )
+      .style.display =
+      "none";
+
+
+    button.disabled = false;
+
+    button.innerText =
+      "Simpan Tanda Tangan & Data";
+
+
+    showPopup(
+      "success",
+      "Berhasil disimpan",
+      "Data telah dikirim untuk disimpan."
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    button.disabled = false;
+
+    button.innerText =
+      "Simpan Tanda Tangan & Data";
+
+
+    showPopup(
+      "error",
+      "Gagal menyimpan",
+      "Tidak dapat terhubung ke server."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   RIWAYAT
+===================================================== */
+
+async function loadHistory() {
+
+  const list =
+    document.getElementById(
+      "historyList"
+    );
+
+
+  list.innerHTML = `
+    <div class="empty">
+      Memuat riwayat...
+    </div>
+  `;
+
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL +
+        "?action=history"
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (!result.success) {
+
+      throw new Error(
+        result.message
+      );
+
+    }
+
+
+    historyData =
+      result.data || [];
+
+
+    filterHistory();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    list.innerHTML = `
+      <div class="empty">
+        Gagal memuat riwayat.
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =====================================================
+   FILTER RIWAYAT
+===================================================== */
+
+function filterHistory() {
+
+  const search =
+    document
+      .getElementById("search")
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  const date =
+    document
+      .getElementById("dateFilter")
+      .value;
+
+
+  const filtered =
+    historyData.filter(
+      function(item) {
+
+        const text = (
+
+          item.namaPasien +
+          " " +
+          item.noRM +
+          " " +
+          item.jenis +
+          " " +
+          item.penerima +
+          " " +
+          item.petugas
+
+        ).toLowerCase();
+
+
+        const matchSearch =
+          !search ||
+          text.includes(search);
+
+
+        const matchDate =
+          !date ||
+          item.tanggal === date;
+
+
+        return (
+          matchSearch &&
+          matchDate
+        );
+
+      }
+    );
+
+
+  renderHistory(filtered);
+
+}
+
+
+/* =====================================================
+   RENDER RIWAYAT
+===================================================== */
+
+function renderHistory(data) {
+
+  const list =
+    document.getElementById(
+      "historyList"
+    );
+
+
+  if (
+    data.length === 0
+  ) {
+
+    list.innerHTML = `
+      <div class="empty">
+        Tidak ada data yang ditemukan.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML = "";
+
+
+  data.forEach(
+    function(item) {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "history-item";
+
+
+      div.innerHTML = `
+
+        <div class="history-name">
+
+          ${escapeHTML(
+            item.namaPasien
+          )}
+
+        </div>
+
+
+        <div class="history-row">
+
+          <span class="history-label">
+            Waktu
+          </span>
+
+          <span class="history-value">
+            ${escapeHTML(
+              item.waktu
+            )}
+          </span>
+
+        </div>
+
+
+        <div class="history-row">
+
+          <span class="history-label">
+            No RM
+          </span>
+
+          <span class="history-value">
+            ${escapeHTML(
+              item.noRM
+            )}
+          </span>
+
+        </div>
+
+
+        <div class="history-row">
+
+          <span class="history-label">
+            Pemeriksaan
+          </span>
+
+          <span class="history-value">
+            ${escapeHTML(
+              item.jenis
+            )}
+          </span>
+
+        </div>
+
+
+        <div class="history-row">
+
+          <span class="history-label">
+            Penerima
+          </span>
+
+          <span class="history-value">
+            ${escapeHTML(
+              item.penerima
+            )}
+          </span>
+
+        </div>
+
+
+        <div class="history-row">
+
+          <span class="history-label">
+            Hubungan
+          </span>
+
+          <span class="history-value">
+            ${escapeHTML(
+              item.hubungan
+            )}
+          </span>
+
+        </div>
+
+
+        <div class="history-row">
+
+          <span class="history-label">
+            Petugas
+          </span>
+
+          <span class="history-value">
+            ${escapeHTML(
+              item.petugas
+            )}
+          </span>
+
+        </div>
+
+
+        <div class="history-row">
+
+          <span class="history-label">
+            TTD
+          </span>
+
+          <span class="history-value">
+
+            ${
+              item.ttd
+
+              ?
+
+              `<a
+                class="ttd-link"
+                href="${escapeAttribute(item.ttd)}"
+                target="_blank">
+
+                Lihat TTD
+
+              </a>`
+
+              :
+
+              "-"
+            }
+
+          </span>
+
+        </div>
+
+      `;
+
+
+      list.appendChild(div);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   RESET FILTER
+===================================================== */
+
+function resetFilter() {
+
+  document
+    .getElementById("search")
+    .value = "";
+
+
+  document
+    .getElementById("dateFilter")
+    .value = "";
+
+
+  filterHistory();
+
+}
+
+
+/* =====================================================
+   SECURITY HTML
+===================================================== */
+
+function escapeHTML(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function escapeAttribute(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+window.addEventListener(
+  "resize",
+  function() {
+
+    if (
+      document
+        .getElementById(
+          "signatureSection"
+        )
+        .style.display !==
+      "none"
+    ) {
+
+      resizeCanvas();
+
+    }
+
+  }
+);
+
+
+renderPatients();
+
+</script>
+
+</body>
+</html>
