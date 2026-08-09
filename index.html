@@ -529,14 +529,6 @@
 
       <div class="card">
 
-        <label>Nama Penerima</label>
-
-        <input
-          id="penerima"
-          type="text"
-          placeholder="Masukkan nama penerima">
-
-
         <label>Hubungan Dengan Pasien</label>
 
         <select id="hubungan">
@@ -546,15 +538,11 @@
           </option>
 
           <option>
-            Pasien Sendiri
+            Pasien Sendiri / Keluarga Pasien
           </option>
 
           <option>
             Petugas Rumah Sakit
-          </option>
-
-          <option>
-            Keluarga Pasien
           </option>
 
         </select>
@@ -653,6 +641,18 @@
           </div>
 
         </div>
+
+
+        <!-- NAMA PENERIMA DIISI SAAT AKAN TANDA TANGAN -->
+
+        <label>
+          Nama Penerima
+        </label>
+
+        <input
+          id="penerima"
+          type="text"
+          placeholder="Masukkan nama penerima">
 
 
         <label>
@@ -977,11 +977,6 @@ function addPatient() {
       .getElementById("jenis")
       .value.trim();
 
-  const penerima =
-    document
-      .getElementById("penerima")
-      .value.trim();
-
   const hubungan =
     document
       .getElementById("hubungan")
@@ -1032,19 +1027,6 @@ function addPatient() {
   }
 
 
-  if (!penerima) {
-
-    showPopup(
-      "warning",
-      "Penerima belum diisi",
-      "Silakan masukkan nama penerima."
-    );
-
-    return;
-
-  }
-
-
   if (!hubungan) {
 
     showPopup(
@@ -1078,8 +1060,6 @@ function addPatient() {
     noRM: noRM,
 
     jenis: jenis,
-
-    penerima: penerima,
 
     hubungan: hubungan,
 
@@ -1171,11 +1151,6 @@ function renderPatients() {
 
           <br>
 
-          Penerima:
-          ${escapeHTML(patient.penerima)}
-
-          <br>
-
           Petugas:
           ${escapeHTML(patient.petugas)}
 
@@ -1241,6 +1216,11 @@ function selectPatient(index) {
     .style.display =
     "block";
 
+
+  // Kosongkan nama penerima untuk pasien yang sedang dipilih
+  document
+    .getElementById("penerima")
+    .value = "";
 
   clearSignature();
 
@@ -1544,6 +1524,25 @@ async function savePatient() {
   }
 
 
+  const penerima =
+    document
+      .getElementById("penerima")
+      .value.trim();
+
+
+  if (!penerima) {
+
+    showPopup(
+      "warning",
+      "Penerima belum diisi",
+      "Silakan masukkan nama penerima terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+
   if (signatureEmpty()) {
 
     showPopup(
@@ -1581,7 +1580,7 @@ async function savePatient() {
       currentPatient.jenis,
 
     penerima:
-      currentPatient.penerima,
+      penerima,
 
     hubungan:
       currentPatient.hubungan,
