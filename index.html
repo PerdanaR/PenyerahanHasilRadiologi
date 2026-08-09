@@ -712,6 +712,17 @@
 
         </div>
 
+        <div
+          id="historyCount"
+          style="
+            color:#888;
+            font-size:12px;
+            margin-top:-8px;
+            margin-bottom:15px;
+          ">
+          0 data
+        </div>
+
 
         <div class="filter">
 
@@ -725,7 +736,7 @@
           <input
             id="dateFilter"
             type="date"
-            onchange="filterHistory()">
+            onchange="loadHistory()">
 
 
           <button
@@ -873,11 +884,21 @@ function showPage(page) {
       .getElementById("menuRiwayat")
       .classList.add("active");
 
-    loadHistory();
+    // Saat membuka Riwayat, gunakan tanggal hari ini
+    if (page === "riwayat") {
+
+      const dateFilter =
+        document.getElementById("dateFilter");
+
+      if (!dateFilter.value) {
+        dateFilter.value =
+          getTodayLocalDate();
+      }
+
+      loadHistory();
+    }
 
   }
-
-}
 
 
 /* =====================================================
@@ -1699,6 +1720,24 @@ async function loadHistory() {
       "historyList"
     );
 
+  const count =
+    document.getElementById(
+      "historyCount"
+    );
+
+  const dateInput =
+    document.getElementById(
+      "dateFilter"
+    );
+
+  // Default: hari ini
+  if (!dateInput.value) {
+    dateInput.value =
+      getTodayLocalDate();
+  }
+
+  const date =
+    dateInput.value;
 
   list.innerHTML = `
     <div class="empty">
@@ -1706,40 +1745,61 @@ async function loadHistory() {
     </div>
   `;
 
+  if (count) {
+    count.innerText =
+      "Memuat jumlah data...";
+  }
 
   try {
 
+    // Ambil hanya data pada tanggal yang dipilih
     const response =
       await fetch(
         API_URL +
-        "?action=history"
+        "?action=history&date=" +
+        encodeURIComponent(date)
       );
 
+    if (!response.ok) {
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
 
     const result =
       await response.json();
 
-
     if (!result.success) {
-
       throw new Error(
         result.message
       );
-
     }
 
-
     historyData =
-      result.data || [];
+      Array.isArray(result.data)
+        ? result.data
+        : [];
 
+    // Tampilkan jumlah data pada tanggal terpilih
+    if (count) {
+      count.innerText =
+        historyData.length +
+        " data pada " +
+        formatDateIndonesia(date);
+    }
 
     filterHistory();
-
 
   } catch (error) {
 
     console.error(error);
 
+    historyData = [];
+
+    if (count) {
+      count.innerText =
+        "Gagal memuat jumlah data";
+    }
 
     list.innerHTML = `
       <div class="empty">
@@ -2001,6 +2061,30 @@ function renderHistory(data) {
 }
 
 
+function formatDateIndonesia(dateString) {
+
+  if (!dateString) {
+    return "";
+  }
+
+  const parts =
+    dateString.split("-");
+
+  if (parts.length !== 3) {
+    return dateString;
+  }
+
+  return (
+    parts[2] +
+    "/" +
+    parts[1] +
+    "/" +
+    parts[0]
+  );
+
+}
+
+
 /* =====================================================
    RESET FILTER
 ===================================================== */
@@ -2011,13 +2095,11 @@ function resetFilter() {
     .getElementById("search")
     .value = "";
 
-
   document
     .getElementById("dateFilter")
-    .value = "";
+    .value = getTodayLocalDate();
 
-
-  filterHistory();
+  loadHistory();
 
 }
 
@@ -2092,6 +2174,37 @@ function escapeAttribute(value) {
       "&#039;"
     );
 
+}
+
+
+/* =====================================================
+   TANGGAL HARI INI
+===================================================== */
+
+function getTodayLocalDate() {
+
+  const now = new Date();
+
+  const year =
+    now.getFullYear();
+
+  const month =
+    String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
+
+  const day =
+    String(
+      now.getDate()
+    ).padStart(2, "0");
+
+  return (
+    year +
+    "-" +
+    month +
+    "-" +
+    day
+  );
 }
 
 
