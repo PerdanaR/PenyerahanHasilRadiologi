@@ -1350,13 +1350,25 @@ function resizeCanvas() {
   const ratio =
     window.devicePixelRatio || 1;
 
+  // Simpan tanda tangan sebelum ukuran canvas berubah.
+  // Keyboard HP dapat memicu resize dan biasanya membuat
+  // canvas terhapus ketika width/height di-set ulang.
+  let signatureImage = null;
+
+  if (
+    canvas.width > 0 &&
+    canvas.height > 0 &&
+    !signatureEmpty()
+  ) {
+    signatureImage =
+      canvas.toDataURL("image/png");
+  }
 
   canvas.width =
     rect.width * ratio;
 
   canvas.height =
     rect.height * ratio;
-
 
   ctx.setTransform(
     ratio,
@@ -1367,14 +1379,33 @@ function resizeCanvas() {
     0
   );
 
-
   ctx.lineWidth = 2;
-
   ctx.lineCap = "round";
-
   ctx.lineJoin = "round";
-
   ctx.strokeStyle = "#111";
+
+  // Kembalikan tanda tangan setelah resize.
+  if (signatureImage) {
+
+    const image =
+      new Image();
+
+    image.onload =
+      function() {
+
+        ctx.drawImage(
+          image,
+          0,
+          0,
+          rect.width,
+          rect.height
+        );
+
+      };
+
+    image.src =
+      signatureImage;
+  }
 
 }
 
